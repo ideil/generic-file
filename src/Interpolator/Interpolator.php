@@ -1,6 +1,6 @@
 <?php namespace Ideil\GenericFile\Interpolator;
 
-use SplFileInfo;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Interpolator {
 
@@ -13,6 +13,7 @@ class Interpolator {
 	public function __construct(Handlers $handlers_base, Handlers $handlers_filters)
 	{
 		$this->handlers_base    = $handlers_base;
+
 		$this->handlers_filters = $handlers_filters;
 	}
 
@@ -39,10 +40,10 @@ class Interpolator {
 	 * Call directive handler by name from passed handlers list with argument
 	 *
 	 * @param  string $directive_key
-	 * @param  SplFileInfo $file
+	 * @param  Symfony\Component\HttpFoundation\File\UploadedFile $file
 	 * @return mixed
 	 */
-	protected function handleDirective($directive_key, SplFileInfo $file)
+	protected function handleDirective($directive_key, UploadedFile $file)
 	{
 		return $this->handlers_base->call($directive_key, $file);
 	}
@@ -75,10 +76,10 @@ class Interpolator {
 	 * Make path to file using path pattern
 	 *
 	 * @param  string $str
-	 * @param  SplFileInfo $file
+	 * @param  Symfony\Component\HttpFoundation\File\UploadedFile $file
 	 * @return Ideil\GenericFile\Interpolator\InterpolatorResult
 	 */
-	public function resolveStorePath($str, SplFileInfo $file)
+	public function resolveStorePath($str, UploadedFile $file)
 	{
 		$cache  = [];
 

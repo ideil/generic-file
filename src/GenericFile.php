@@ -1,8 +1,7 @@
 <?php namespace Ideil\GenericFile;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Exception;
-
-use SplFileInfo;
 
 /**
  * Easy file upload management.
@@ -10,7 +9,7 @@ use SplFileInfo;
  * This package was inspired by Stapler
  *
  * @package Ideil/GenericFile
- * @version v0.1.6
+ * @version v0.1.0
  * @author Sergiy Litvinchuk <sergiy.litvinchuk@gmail.com>
  * @link
  */
@@ -34,7 +33,7 @@ class GenericFile {
 	/**
 	 * Constructor method.
 	 */
-	public function __construct($config)
+	public function __construct(array $config)
 	{
 		// store config
 
@@ -98,27 +97,21 @@ class GenericFile {
 	 */
 	protected function getStoreRootPath()
 	{
-		$public_path = $this->getConfig('store.public_path', '');
-
-		$public_path = rtrim($public_path, '/');
-
-		if ($public_path)
-		{
+		if ($public_path = rtrim($this->getConfig('store.public_path', ''), '/'))
 			return $public_path;
-		}
 
 		throw new Exception('No public path configured', 1);
 	}
 
 	/**
-	 * Move uploaded file to path by pattern and update model
+	 * Move uploaded file to path by pattern
 	 *
-	 * @param  SplFileInfo $file
+	 * @param  Symfony\Component\HttpFoundation\File\UploadedFile $file
 	 * @param  string|null $path_pattern
 	 *
 	 * @return string|null
 	 */
-	public function store(SplFileInfo $file, $path_pattern = null)
+	public function moveUploadedFile(UploadedFile $file, $path_pattern = null)
 	{
 		// inperpolate path_pattern using $file
 		// and get interpolator result object
@@ -127,36 +120,20 @@ class GenericFile {
 			$path_pattern ?: $this->getConfig('store.path_pattern', ''), $file);
 
 		// file will be moved to interpolated path
-		// and configured public_path as root
+		// using configured public_path as root
 
 		$target = $this->getStoreRootPath() . '/' . ltrim($interpolated, '/');
 
 		if ( ! file_exists($target))
 		{
-			// try use built in move method (Laravel)
-
-			if (method_exists($file, 'move'))
-			{
-				$file->move(dirname($target), basename($target));
-
-				return $interpolated;
-			}
-
-			// else use move_uploaded_file function
-
-			if ( ! @move_uploaded_file($this->getPathname(), $target))
-			{
-				$error = error_get_last();
-
-				throw new Exception(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
-			}
+			$file->move(dirname($target), basename($target));
 		}
 
 		return $interpolated;
 	}
 
 	/**
-	 * Make url to stored file
+	 * Make url to uploaded file
 	 *
 	 * @param array|object $model
 	 * @param string|null  $path_pattern
@@ -164,7 +141,7 @@ class GenericFile {
 	 *
 	 * @return string
 	 */
-	public function url($model, $path_pattern = null, array $model_map = array())
+	public function makeUrlToUploadedFile($model, $path_pattern = null, array $model_map = array())
 	{
 		$pattern = $path_pattern
 			?: $this->getConfig('http.path_pattern', '');
@@ -179,7 +156,7 @@ class GenericFile {
 	}
 
 	/**
-	 * Full path to stored file
+	 * Full path to uploaded file
 	 *
 	 * @param array|object $model
 	 * @param string|null  $path_pattern
@@ -187,7 +164,7 @@ class GenericFile {
 	 *
 	 * @return string
 	 */
-	public function path($model, $path_pattern = null, array $model_map = array())
+	public function makePathToUploadedFile($model, $path_pattern = null, array $model_map = array())
 	{
 		$pattern   = $path_pattern ?: $this->getConfig('store.path_pattern', '');
 
@@ -199,14 +176,14 @@ class GenericFile {
 	}
 
 	/**
-	 * Delete stored file
+	 * Delete uploaded file
 	 *
 	 * @param array|Illuminate\Database\Eloquent\Model $model
 	 * @param string|null $path_pattern
 	 *
 	 * @return string
 	 */
-	public function delete($model, $path_pattern = null)
+	public function deleteUploadedFile($model, $path_pattern = null)
 	{
 		if ( ! $this->canRemoveFiles())
 		{
