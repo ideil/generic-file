@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ideil/generic-file.svg)](https://travis-ci.org/ideil/generic-file) [![Latest Stable Version](https://poser.pugx.org/ideil/generic-file/version)](https://packagist.org/packages/ideil/generic-file) [![Latest Unstable Version](https://poser.pugx.org/ideil/generic-file/v/unstable)](https://packagist.org/packages/ideil/generic-file) [![License](https://poser.pugx.org/ideil/generic-file/license)](https://packagist.org/packages/ideil/generic-file)
+
 GenericFile
 ==================
 
