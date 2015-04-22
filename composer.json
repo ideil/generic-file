@@ -1,0 +1,21 @@
+{
+    "name": "ideil/generic-file",
+    "description": "Easy uploaded files store management library.",
+    "keywords": ["file", "upload"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sergiy Litvinchuk",
+            "email": "s.litvinchuk@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ideil\\GenericFile\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
