@@ -16,6 +16,5 @@
         "psr-4": {
             "Ideil\\GenericFile\\": "src/"
         }
-    },
-    "minimum-stability": "stable"
+    }
 }
