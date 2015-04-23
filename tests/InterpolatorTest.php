@@ -2,6 +2,8 @@
 
 use ReflectionClass;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 class InterpolatorTest extends \PHPUnit_Framework_TestCase {
 
 	/**
@@ -70,13 +72,15 @@ class InterpolatorTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 *
 	 */
-	public function getMockedSplFileInfo()
+	public function getUploadedFile()
 	{
-		$mocked = $this->getMock('SplFileInfo', [], [null]);
+		$file = new UploadedFile(
+			__DIR__.'/Fixtures/test.gif',
+			'original.gif',
+			null
+		);
 
-		$mocked->method('getFilename')->willReturn('/tmp/somefile.dat');
-
-		return $mocked;
+		return $file;
 	}
 
 	/**
@@ -151,7 +155,7 @@ class InterpolatorTest extends \PHPUnit_Framework_TestCase {
 	{
 		$result = $this->invokePrivateMethod('handleDirective', [
 			'contenthash',
-			$this->getMockedSplFileInfo(),
+			$this->getUploadedFile(),
 		]);
 
 		$this->assertEquals($result, 'somefilehashstring');
@@ -181,7 +185,7 @@ class InterpolatorTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testCorrectResolveStorePath($pattern, $match)
 	{
-		$interpolated = $this->interpolator->resolveStorePath($pattern, $this->getMockedSplFileInfo());
+		$interpolated = $this->interpolator->resolveStorePath($pattern, $this->getUploadedFile());
 
 		$this->assertEquals($interpolated->getResult(), $match);
 	}
@@ -229,7 +233,7 @@ class InterpolatorTest extends \PHPUnit_Framework_TestCase {
 	{
 		$this->setExpectedException('UnexpectedValueException');
 
-		$this->interpolator->resolveStorePath($pattern, $this->getMockedSplFileInfo());
+		$this->interpolator->resolveStorePath($pattern, $this->getUploadedFile());
 	}
 
 	/**
