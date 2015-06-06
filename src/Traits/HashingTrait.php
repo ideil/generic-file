@@ -1,6 +1,6 @@
 <?php namespace Ideil\GenericFile\Traits;
 
-trait HashingTrait {
+trait HashingTraitx {
 
 	/**
 	 * Convert number to selected base
