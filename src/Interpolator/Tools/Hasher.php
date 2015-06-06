@@ -4,7 +4,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Hasher {
 
-	use Ideil\GenericFile\Traits\HashingTrait;
+	use \Ideil\GenericFile\Traits\HashingTrait;
 
 	/**
 	 * Make hash from uploaded file.
