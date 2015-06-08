@@ -141,12 +141,15 @@ class GenericFile {
 	 *
 	 * @return string
 	 */
-	public function makeUrlToUploadedFile($model, $path_pattern = null, array $model_map = array())
+	public function makeUrlToUploadedFile($model, $path_pattern = null, array $model_map = array(), $domain = null)
 	{
 		$pattern = $path_pattern
 			?: $this->getConfig('http.path_pattern', '');
 
-		$domain = $this->getConfig('http.domain', '');
+		if (is_null($domain))
+		{
+			$domain = $this->getConfig('http.domain', '');	
+		}
 
 		$path = $this->interpolator->resolvePath($pattern, $model, $model_map)->getResult();
 
