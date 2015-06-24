@@ -1,6 +1,6 @@
 <?php namespace Ideil\GenericFile\Interpolator;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Ideil\GenericFile\Resources\File;
 
 class Interpolator {
 
@@ -21,6 +21,7 @@ class Interpolator {
 	 * Extract interpolation directives and filters from input string
 	 *
 	 * @param string $str
+	 *
 	 * @return array
 	 */
 	protected function parseInterpolationString($str)
@@ -28,10 +29,14 @@ class Interpolator {
 		$parsed = [];
 
 		if ( ! preg_match_all('~\{([a-z\d_\-\|\#]+?)\}~i', $str, $matches))
+		{
 			return $parsed;
+		}
 
 		foreach ($matches[1] as $key => $value)
+		{
 			$parsed[$matches[0][$key]] = explode('|', $value);
+		}
 
 		return $parsed;
 	}
@@ -40,10 +45,11 @@ class Interpolator {
 	 * Call directive handler by name from passed handlers list with argument
 	 *
 	 * @param  string $directive_key
-	 * @param  Symfony\Component\HttpFoundation\File\UploadedFile $file
+	 * @param  File $file
+	 *
 	 * @return mixed
 	 */
-	protected function handleDirective($directive_key, UploadedFile $file)
+	protected function handleDirective($directive_key, File $file)
 	{
 		return $this->handlers_base->call($directive_key, $file);
 	}
@@ -53,12 +59,15 @@ class Interpolator {
 	 *
 	 * @param  array $data
 	 * @param  mixed $arg
+	 *
 	 * @return mixed
 	 */
 	protected function handleSubdirectives(array $data, $arg)
 	{
 		if (count($data) <= 1)
+		{
 			return $arg;
+		}
 
 		// remove base directive
 
@@ -67,7 +76,9 @@ class Interpolator {
 		// call handler for each filter
 
 		foreach ($data as $value)
+		{
 			$arg = $this->handlers_filters->call($value, $arg);
+		}
 
 		return $arg;
 	}
@@ -76,10 +87,11 @@ class Interpolator {
 	 * Make path to file using path pattern
 	 *
 	 * @param  string $str
-	 * @param  Symfony\Component\HttpFoundation\File\UploadedFile $file
-	 * @return Ideil\GenericFile\Interpolator\InterpolatorResult
+	 * @param  File $file
+	 *
+	 * @return InterpolatorResult
 	 */
-	public function resolveStorePath($str, UploadedFile $file)
+	public function resolveStorePath($str, File $file)
 	{
 		$cache  = [];
 
@@ -107,10 +119,11 @@ class Interpolator {
 	/**
 	 * Make url to file using path pattern
 	 *
-	 * @param  string $str
-	 * @param  array|Illuminate\Database\Eloquent\Model $model
+	 * @param  string  $str
+	 * @param  array  $model
 	 * @param  array  $model_map
-	 * @return Ideil\GenericFile\Interpolator\InterpolatorResult
+	 *
+	 * @return InterpolatorResult
 	 */
 	public function resolvePath($str, $model, $model_map = array())
 	{

@@ -3,6 +3,7 @@
 use ReflectionClass;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Ideil\GenericFile\Resources\File;
 
 class InterpolatorTest extends \PHPUnit_Framework_TestCase {
 
@@ -80,7 +81,7 @@ class InterpolatorTest extends \PHPUnit_Framework_TestCase {
 			null
 		);
 
-		return $file;
+		return new File($file, 'original.gif');
 	}
 
 	/**

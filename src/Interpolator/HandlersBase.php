@@ -1,5 +1,7 @@
 <?php namespace Ideil\GenericFile\Interpolator;
 
+use Ideil\GenericFile\Tools\Hasher;
+
 class HandlersBase extends Handlers {
 
 	/**
@@ -17,7 +19,7 @@ class HandlersBase extends Handlers {
 
 				if ( ! isset($this->hasher))
 				{
-					$this->hasher = new Tools\Hasher;
+					$this->hasher = new Hasher;
 				}
 
 				return $this->hasher->file($file);

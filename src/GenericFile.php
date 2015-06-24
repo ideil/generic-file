@@ -1,6 +1,6 @@
 <?php namespace Ideil\GenericFile;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Ideil\GenericFile\Resources\File;
 use Exception;
 
 /**
@@ -9,7 +9,7 @@ use Exception;
  * This package was inspired by Stapler
  *
  * @package Ideil/GenericFile
- * @version v0.1.0
+ * @version v0.1.1
  * @author Sergiy Litvinchuk <sergiy.litvinchuk@gmail.com>
  * @link
  */
@@ -62,10 +62,14 @@ class GenericFile {
 		$array = $this->config;
 
 		if (is_null($key))
+		{
 			return $array;
+		}
 
 		if (isset($array[$key]))
+		{
 			return $array[$key];
+		}
 
 		foreach (explode('.', $key) as $segment)
 		{
@@ -106,12 +110,12 @@ class GenericFile {
 	/**
 	 * Move uploaded file to path by pattern
 	 *
-	 * @param  Symfony\Component\HttpFoundation\File\UploadedFile $file
+	 * @param  File $file
 	 * @param  string|null $path_pattern
 	 *
 	 * @return string|null
 	 */
-	public function moveUploadedFile(UploadedFile $file, $path_pattern = null)
+	public function moveUploadedFile(File $file, $path_pattern = null)
 	{
 		// inperpolate path_pattern using $file
 		// and get interpolator result object
@@ -133,6 +137,60 @@ class GenericFile {
 	}
 
 	/**
+	 * @param  string $url
+	 * @return File|null
+	 */
+	public function fetchFileByUrl($url)
+	{
+		if ( ! $url = trim($url))
+		{
+			return null;
+		}
+
+		$temp_file = tempnam(sys_get_temp_dir(), 'fetch');
+
+		$client = new \GuzzleHttp\Client;
+
+		try
+		{
+			$resp = $client->get($url, ['save_to' => $temp_file]);
+		}
+		catch(Exception $e)
+		{
+			return null;
+		}
+
+		if ($resp->getStatusCode() != 200)
+		{
+			return null;
+		}
+
+		$name = basename(parse_url($url, PHP_URL_PATH));
+		$mime = $resp->getHeader('content-type');
+		$size = filesize($temp_file);
+
+		return new File($temp_file, $name, $mime, $size);
+	}
+
+	/**
+	 * @param  string $url
+	 * @param  string $path_pattern
+	 * @return string|null
+	 */
+	public function fetchUrl($url, $path_pattern = null)
+	{
+		if ($file = $this->fetchFileByUrl($url))
+		{
+			$pattern = $path_pattern
+				?: $this->getConfig('http.path_pattern', '');
+
+			return $this->moveUploadedFile($file, $path_pattern);
+		}
+
+		return null;
+	}
+
+	/**
 	 * Make url to uploaded file
 	 *
 	 * @param array|object $model
@@ -148,7 +206,7 @@ class GenericFile {
 
 		if (is_null($domain))
 		{
-			$domain = $this->getConfig('http.domain', '');	
+			$domain = $this->getConfig('http.domain', '');
 		}
 
 		$path = $this->interpolator->resolvePath($pattern, $model, $model_map)->getResult();
@@ -169,11 +227,11 @@ class GenericFile {
 	 */
 	public function makePathToUploadedFile($model, $path_pattern = null, array $model_map = array())
 	{
-		$pattern   = $path_pattern ?: $this->getConfig('store.path_pattern', '');
+		$pattern = $path_pattern ?: $this->getConfig('store.path_pattern', '');
 
-		$path = $this->interpolator->resolvePath($pattern, $model, $model_map)->getResult();
+		$path    = $this->interpolator->resolvePath($pattern, $model, $model_map)->getResult();
 
-		$path = $this->getStoreRootPath() . '/' . ltrim($path, '/');
+		$path    = $this->getStoreRootPath() . '/' . ltrim($path, '/');
 
 		return $path;
 	}

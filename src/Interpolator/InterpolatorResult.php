@@ -11,6 +11,7 @@ class InterpolatorResult {
 	public function __construct($data, $result)
 	{
 		$this->data = $data;
+
 		$this->result = $result;
 	}
 
